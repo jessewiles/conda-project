@@ -48,6 +48,7 @@ def cli() -> ArgumentParser:
     _create_activate_parser(subparsers, common)
     _create_clean_parser(subparsers, common)
     _create_run_parser(subparsers, common)
+    _create_add_dependency_parser(subparsers, common)
 
     return p
 
@@ -314,6 +315,41 @@ def _create_activate_parser(
     )
 
     p.set_defaults(func=commands.activate)
+
+
+def _create_add_dependency_parser(
+    subparsers: "_SubParsersAction", parent_parser: ArgumentParser
+) -> None:
+    """Add a subparser for the "run" subcommand.
+
+    Args:
+        subparsers: The existing subparsers corresponding to the "command" meta-variable.
+        parent_parser: The parent parser, which is used to pass common arguments into the subcommands.
+
+    """
+    desc = "Add package dependencies to the specified environments."
+
+    p = subparsers.add_parser(
+        "add-deps", description=desc, help=desc, parents=[parent_parser]
+    )
+    p.add_argument(
+        "--environment",
+        help="Activate selected environment in a new shell. If no environment name is selected "
+        "the first environment defined in the conda-project.yml file is activated.",
+        nargs="?",
+    )
+    p.add_argument(
+        "dependencies",
+        help=(
+            "Packages to add to the environment.yml. The format for each package is '<name>[<op><version>]' "
+            "where <op> can be =, <, >, <=, or >=."
+        ),
+        action="store",
+        nargs="*",
+        metavar="PACKAGE_SPECIFICATION",
+    )
+
+    p.set_defaults(func=commands.add_dependencies)
 
 
 def parse_and_run(args: list[str] | None = None) -> int:

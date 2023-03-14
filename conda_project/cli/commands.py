@@ -136,3 +136,17 @@ def activate(args: Namespace) -> bool:
     env.activate(verbose=True)
 
     return True
+
+
+@handle_errors
+def add_dependencies(args: Namespace) -> bool:
+    project = CondaProject(args.directory)
+
+    if args.environment:
+        env = project.environments[args.environment]
+    else:
+        env = project.default_environment
+
+    env.add_dependencies(args.dependencies, verbose=True)
+
+    return True
