@@ -678,6 +678,21 @@ class Environment(BaseModel):
 
         conda_activate(prefix=self.prefix, working_dir=self.project.directory, env=env)
 
+    def add_dependencies(self, dependencies: List[str], verbose=False) -> None:
+        dep_set: set[str] = set(dependencies)
+        for fn in self.sources:
+            env = EnvironmentYaml.parse_yaml(fn)
+            for item in env.dependencies:
+                if isinstance(item, str):
+                    dep_set.add(item)
+                elif isinstance(item, dict):
+                    # TODO ???
+                    pass
+
+            env.dependencies = list(dep_set)
+            env.yaml(fn)
+        self.prepare(force=True, verbose=verbose)
+
 
 Environment.update_forward_refs()
 
